@@ -1,0 +1,117 @@
+package game;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class FileManager {
+
+	private String filename;
+	
+	
+	public FileManager(){
+		filename = "users.txt";
+	}
+	
+	//returns true if username is in file
+	//(for new user: show error message if return true, if not, add user)
+	public boolean userExists(String username){
+		boolean exists = false;
+		
+		try{
+			FileReader fr= new FileReader(filename);
+			BufferedReader br = new BufferedReader(fr);
+			String line;
+			while((line = br.readLine()) != null){
+				if(line.startsWith(username)){
+					exists = true;
+				}
+			} 
+			br.close();
+			fr.close();
+		}catch(FileNotFoundException fnfe){
+			System.out.println("File not found exception: " + fnfe.getMessage());
+		}catch (IOException ioe) {
+			System.out.println("IOException: " + ioe.getMessage());
+		}
+		
+		
+		return exists;
+	}
+	
+	//returns true if username is in file and matches password
+	public boolean userLogin(String username, String password){
+		boolean correctLogin = false;
+		try{
+			FileReader fr= new FileReader(filename);
+			BufferedReader br = new BufferedReader(fr);
+			String line;
+			String [] words;
+			while((line = br.readLine()) != null){
+				words = line.split(" ");
+//				System.out.println("username : " + username + words[0]);
+//				System.out.println("password: " + password + words[1]);
+				if((words[0].equals(username)) && words[1].equals(password)){
+					correctLogin = true;
+				}
+			} 
+			br.close();
+			fr.close();
+		}catch(FileNotFoundException fnfe){
+			System.out.println("File not found exception: " + fnfe.getMessage());
+		}catch (IOException ioe) {
+			System.out.println("IOException: " + ioe.getMessage());
+		}
+		
+		return correctLogin;
+	}
+	
+	//appends username, password, 0 for high score to end of file
+	public void addUser(String username, String password){
+		
+		FileWriter fw = null;
+		BufferedWriter bw = null;
+		try{
+			
+			 fw = new FileWriter(filename, true);
+			 bw = new BufferedWriter(fw);
+			 System.out.println("Writing: " + username + " " + password + " 0");
+			bw.write(username + " " + password + " 0");
+			bw.newLine();
+			bw.flush();
+			
+		}catch(IOException ioe){
+			System.out.println("IOException: " + ioe.getMessage());
+		}
+		finally{
+			if(bw != null){
+				try {
+					bw.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if(fw != null){
+				try {
+					fw.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+		}
+	}
+	
+	public void changeHighScore(String username, int score){
+
+		
+	}
+	
+	
+}

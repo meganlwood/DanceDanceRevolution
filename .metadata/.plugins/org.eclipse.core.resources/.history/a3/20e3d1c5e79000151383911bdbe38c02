@@ -1,0 +1,51 @@
+package server;
+
+import java.io.*;
+import java.net.Socket;
+
+
+public class ServerClientCommunicator extends Thread {
+
+	private Socket socket;
+	private ObjectOutputStream oos;
+	private BufferedReader br;
+	private ServerListener serverListener;
+	
+	public ServerClientCommunicator(Socket s, ServerListener sl) throws IOException {
+		socket = s;
+		serverListener = sl;
+		oos = new ObjectOutputStream(socket.getOutputStream());
+		br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+	}
+	
+	public void run() {
+		try {
+			String line = br.readLine();
+			while (line != null){
+				ServerGUI.addMessage(socket.getInetAddress() + ":" + socket.getPort() + " - " + line);
+				System.out.println("On GUI");
+				if(line.equals("|AUTHENTICATE|"))
+				{
+					System.out.println("Printing");
+					String un = br.readLine();
+					un = un.substring(1,un.length()-1);
+					System.out.println(un);
+					
+					String pw = br.readLine();
+					pw = pw.substring(1,pw.length()-1);
+					System.out.println(pw);
+				}
+				line = br.readLine();
+			}
+		} catch (IOException ioe) {
+			serverListener.removeServerClientCommunicator(this);
+			ServerGUI.addMessage(socket.getInetAddress() + ":" + socket.getPort() + " - " + "User has disconnected");
+			
+			try {
+				socket.close();
+			} catch (IOException ioe1) {
+				//Print
+			}
+		}
+	}
+}
